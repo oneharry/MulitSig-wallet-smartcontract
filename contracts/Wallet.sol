@@ -19,17 +19,16 @@ contract Wallet {
     address public owner;
     uint256 private proposalId;
     uint256 private totalNumberOwners;
-    Proposal public myProposal;
+    Proposal private proposal;
     
 
     //mapping
     mapping(address => bool) public ownersList; //address of all owners mapped to true
-    mapping(uint => Proposal) listOfProposals; //
+    mapping(uint => Proposal) public listOfProposals; //
     
 
     constructor() {
         owner = msg.sender;
-
     }
 
     //MODIFIERS
@@ -93,9 +92,9 @@ contract Wallet {
     function createProposal(string memory _info) 
     external 
     onlyOwners {
-        myProposal = new Proposal(_info,msg.sender);
-       
-        listOfProposals[proposalId].setProposerAddress(msg.sender);
+        Proposal myProposal = new Proposal();
+        listOfProposals[proposalId] = myProposal;
+        listOfProposals[proposalId].setProposalInfo(_info,msg.sender);
         proposalId = proposalId + 1;
        emit CreateProposal(msg.sender, proposalId);
     }
@@ -129,4 +128,12 @@ contract Wallet {
     returns(address) {
         return listOfProposals[_proposalId].getProposerAddress();
     }  
+
+    //returns the percentage of a proposal
+    function getPercentage(uint256 _proposalId) 
+    public 
+    view
+    returns(uint256) {
+        return listOfProposals[_proposalId].getPercent();
+    }
 }
