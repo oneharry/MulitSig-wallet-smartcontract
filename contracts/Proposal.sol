@@ -9,11 +9,11 @@ pragma solidity ^0.8.0;
 contract Proposal {
 
     //state variables
-    uint private percentageAcceptance;
+    uint public percentageAcceptance;
     bool private isProposalOn;
     uint256 private numberOfApprovals;
-    uint256 approvedPercent;
-    address ownerContract;
+    uint256 private approvedPercent;
+    address public ownerContract;
     address public proposalOwner;
 
     address[] public agreeingOwners;
@@ -24,10 +24,9 @@ contract Proposal {
     mapping(address => bool) public agreeingOwnersList;
 
 
-    constructor(string memory _info, address _proposer) {
-        proposalOwner = _proposer;
-        proposalInformation = _info;
+    constructor() {
         percentageAcceptance = 60;
+        ownerContract = msg.sender;
     }
 
     //MODIFIERS
@@ -79,7 +78,7 @@ contract Proposal {
         } else {
         // calculate the percentage of acceptance
         //check that the specified percentage condition is met
-        approvedPercent = (numberOfApprovals/_totalNumberOwners) * 100;
+        approvedPercent = numberOfApprovals/_totalNumberOwners*100;
         require(approvedPercent >= percentageAcceptance);
 
         //EXECUTE 
@@ -98,10 +97,12 @@ contract Proposal {
     }
 
     
-    function setProposerAddress(address _adr)
+    function setProposalInfo(string memory _info, address _adr)
     external
+    onlyWallet
     returns(bool) {
         proposalOwner = _adr;
+        proposalInformation = _info;
         return true;
     }
 
@@ -112,7 +113,12 @@ contract Proposal {
         return proposalOwner;
     }
 
-
+    function getPercent()
+    external
+    view
+    returns(uint256) {
+        return percentageAcceptance;
+    }
     
 
 
